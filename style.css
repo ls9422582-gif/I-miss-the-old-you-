@@ -1,0 +1,226 @@
+/* ==========================================================================
+   1. 刚性文档流重置（纯上下堆叠，完全杜绝文字相互重叠覆盖）
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0A0A0A;
+    color: #E2E2E2;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
+    line-height: 2.0;
+}
+
+p {
+    margin-bottom: 24px;
+    letter-spacing: 0.12em;
+    font-weight: 300;
+}
+
+p:last-child {
+    margin-bottom: 0;
+}
+
+.gold { color: #C8A96B; }
+.sub-gray { color: #777777; font-size: 0.95rem; }
+
+.static-container {
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 0;
+}
+
+.text-center { text-align: center; }
+.space-top-md { margin-top: 40px; }
+.end-blank { height: 60px; }
+
+/* 音乐开关 */
+.music-control {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    padding: 6px 14px;
+    border: 1px solid rgba(234, 234, 234, 0.2);
+    border-radius: 20px;
+    cursor: pointer;
+    background: rgba(10, 10, 10, 0.85);
+    font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   2. 封面 */
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 45vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0A0A0A;
+}
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('images/2024%E5%A4%A7.jpg') no-repeat center 30% / cover;
+    opacity: 0.35;
+}
+.hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 0 20px;
+}
+.main-title {
+    font-size: 1.45rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   3. 动画仅支持不带位移的 opacity 淡入 */
+.fade-in {
+    opacity: 0;
+    transition: opacity 1.0s ease;
+}
+.fade-in.visible {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   4. 真正的 Column 瀑布流照片墙
+   - 不使用固定格子
+   - 不裁切照片
+   - 不在 hover 时切换 filter，避免黑闪
+   ========================================================================== */
+.photo-wall {
+    column-count: 4;
+    column-gap: 12px;
+    width: min(1080px, 92vw);
+    margin: 70px auto;
+}
+
+.photo-card {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 12px;
+    background: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    opacity: 1;
+    transform: translateZ(0);
+    will-change: transform;
+    transition: transform .32s ease, box-shadow .32s ease, opacity .32s ease;
+}
+
+.photo-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    border-radius: 10px;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    filter: none !important;
+}
+
+.photo-card:hover {
+    transform: scale(1.07) translateZ(0);
+    z-index: 50;
+    box-shadow: 0 18px 42px rgba(0,0,0,.62);
+}
+
+/* 不再用 filter 变暗，避免黑闪；只用轻微透明度营造聚焦 */
+.photo-wall:hover .photo-card:not(:hover) {
+    opacity: .72;
+}
+
+.photo-card:hover,
+.photo-card.active {
+    opacity: 1;
+}
+
+/* 照片底部信息层：默认轻微可见，hover 更清晰，防止“文字没了” */
+.item-meta {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 32px 12px 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.32) 58%, transparent 100%);
+    opacity: .72;
+    transition: opacity .28s ease, background .28s ease;
+    pointer-events: none;
+    text-align: left;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.photo-card:hover .item-meta,
+.photo-card.active .item-meta {
+    opacity: 1;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.38) 62%, transparent 100%);
+}
+
+.meta-date {
+    display: block;
+    font-size: 11px;
+    line-height: 1.25;
+    color: #C8A96B;
+    margin-bottom: 4px;
+    letter-spacing: .04em;
+}
+
+.meta-place {
+    display: block;
+    font-size: 13px;
+    line-height: 1.38;
+    color: #F0F0F0;
+    text-shadow: 0 1px 7px rgba(0,0,0,.8);
+    white-space: normal;
+    word-break: keep-all;
+}
+
+/* ==========================================================================
+   5. 昏睡照片章节 */
+.sleep-flex-row {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+}
+.sleep-photo-holder {
+    flex: 1;
+    max-width: 420px;
+}
+.sleep-photo-holder img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+}
+
+/* ==========================================================================
+   6. 瀑布流响应式断点定义 */
+@media (max-width: 900px) {
+    .photo-wall { column-count: 3; }
+}
+
+@media (max-width: 600px) {
+    .photo-wall { column-count: 2; }
+    .sleep-flex-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    .sleep-photo-holder { width: 100%; }
+    .static-container { padding: 40px 0; }
+}
